@@ -26,10 +26,7 @@ feature_list = ['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0', 'T01_TCHL', 'T01_
 x = data[['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0',
                   'T01_TCHL', 'T01_HDL']]
 # target - drink 에 대한 categorical data (FQ)
-target_list = ['T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ', 'T01_BEERFQ', 'T01_HLIQFQ']
-
-# 'T01_DRINK', 'T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ',
-#           'T01_BEERFQ', 'T01_HLIQFQ'
+target_list = ['T01_DRINK', 'T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ', 'T01_BEERFQ', 'T01_HLIQFQ']
 
 # test data set
 
@@ -42,9 +39,6 @@ def Scaling_KNN(data, feature, target, scaling, test_size, n_neighbors):
 
     # Split the dataset into 4/5 training and 1/5 for testing.
     x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
-
-    print(x_test.head(30))
-    print(y_test.head(30))
 
     # ------------------------------------- Scaling ------------------------------------------------
     # robustScaling
@@ -107,8 +101,7 @@ def Scaling_KNN(data, feature, target, scaling, test_size, n_neighbors):
     print('for test set: ', np.mean(y_predict == y_test))
 
     y_predict = pd.DataFrame(y_predict)
-    print(y_predict.head(30))
 
 # target list 에 있는 것들 하나씩 scale_knn의 target으로 주기
 for idx, target in enumerate(target_list):
-    Scaling_KNN(data, feature_list, target, 'minmax', 0.2, 3)
+    Scaling_KNN(data, feature_list, target, 'robust', 0.2, 3)
