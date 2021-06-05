@@ -1,28 +1,114 @@
-# heatmap 으로 attribute 간의 상관관계
-
-import pandas as pd
+from sklearn.neighbors import KNeighborsClassifier
 import numpy as np
+import pandas as pd
+from sklearn import preprocessing
+import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
-# read csv
-data01 = pd.read_csv('merge01.csv')
-data02 = pd.read_csv('merge02.csv')
-data03 = pd.read_csv('merge03.csv')
-data04 = pd.read_csv('merge04.csv')
+# setting show all col
+pd.set_option('display.max_columns', None)
 
-# feature: 고지혈증,당뇨병 의 병의 여부와 음주 강도
-# target: 헤모글로빈, 혈압 등 수치
+data = pd.read_csv('total dataset_cleaned_edit.csv')
 
-# data01 에 대한 feature, target 분리
-features = ['T01_DRINK', 'T01_TAKAM', 'T01_RICEAM', 'T01_WINEAM', 'T01_SOJUAM', 'T01_BEERAM',
-            'T01_HLIQAM', 'T01_SMAM', 'T01_TAKFQ','T01_RICEFQ', 'T01_WINEFQ', 'T01_SOJUFQ',
-            'T01_BEERFQ', 'T01_HLIQFQ', 'T01_SMOKE', 'T01_HTN', 'T01_DM', 'T01_LIP', 'T02_DRINK',
-            'T02_TAKAM', 'T02_RICEAM', 'T02_WINEAM', 'T02_SOJUAM', 'T02_BEERAM', 'T02_HLIQAM',
-            'T02_SMAM', 'T02_TAKFQ', 'T02_RICEFQ', 'T02_WINEFQ', 'T02_SOJUFQ', 'T02_BEERFQ',
-            'T02_HLIQFQ', 'T02_SMOKE', 'T02_HTN', 'T02_DM', 'T02_LIP']
-target = ['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0', 'T01_TCHL', 'T01_HDL',
-          'T02_SBP', 'T02_DBP', 'T02_HBA1C', 'T02_GLU0', 'T02_TCHL', 'T02_HDL']
+# 열 제거
+# T00_ID, T00_DATA_CLASS, T01_EDATE은 scaling 대상에서 제외하기 위해서
+data = data.iloc[:,3:]
 
-x, y = data01[features], data01[target]
+# cleaning data
+# Fill missing values with mean column values in the df
+data.fillna(data.mean(), inplace=True)
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, shuffle=True)
+# change data type from object to float
+data = data.apply(pd.to_numeric, errors='coerce').fillna(0)
+
+# feature - 혈액 건강 지표
+feature_list = ['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0', 'T01_TCHL', 'T01_HDL']
+x = data[['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0',
+                  'T01_TCHL', 'T01_HDL']]
+# target - drink 에 대한 categorical data (FQ)
+target_list = ['T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ', 'T01_BEERFQ', 'T01_HLIQFQ']
+
+# 'T01_DRINK', 'T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ',
+#           'T01_BEERFQ', 'T01_HLIQFQ'
+
+# test data set
+
+# function with robust-scaling and knn
+# data, feature, target을 param으로 받아서
+# train, test set을 분류하기
+def Scaling_KNN(data, feature, target, scaling, test_size, n_neighbors):
+    x = data[feature]
+    y = data[target]
+
+    # Split the dataset into 4/5 training and 1/5 for testing.
+    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+
+    print(x_test.head(30))
+    print(y_test.head(30))
+
+    # ------------------------------------- Scaling ------------------------------------------------
+    # robustScaling
+    if scaling == 'robust':
+        scaler = preprocessing.RobustScaler()
+        scaler.fit(x_train)
+        robust_scaled_train = scaler.transform(x_train)
+        robust_scaled_test = scaler.transform(x_test)
+
+        # numpy to dataframe
+        x_train = pd.DataFrame(robust_scaled_train)
+        x_test = pd.DataFrame(robust_scaled_test)
+
+    # standardScaling
+    elif scaling == 'standard':
+        scaler = preprocessing.StandardScaler()
+        scaler.fit(x_train)
+        standard_scaled_train = scaler.transform(x_train)
+        standard_scaled_test = scaler.transform(x_test)
+
+        # numpy to dataframe
+        x_train = pd.DataFrame(standard_scaled_train)
+        x_test = pd.DataFrame(standard_scaled_test)
+
+    # minmaxScaling
+    elif scaling == 'minmax':
+        scaler = preprocessing.MinMaxScaler()
+        scaler.fit(x_train)
+        minmax_scaled_train = scaler.transform(x_train)
+        minmax_scaled_test = scaler.transform(x_test)
+
+        # numpy to dataframe
+        x_train = pd.DataFrame(minmax_scaled_train)
+        x_test = pd.DataFrame(minmax_scaled_test)
+
+    else:
+        print("error occur")
+        return 0
+
+    # -------------------------------- KNN --------------------------------
+    y_train = y_train.astype('int')
+    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
+
+    knn.fit(x_train, y_train)
+
+    # 테스트 셋을 통해 예측한 값
+    y_predict = knn.predict(x_test)
+
+    # 정답과 예측 데이터셋의 정확도를 matplotlib으로 표현
+    # plt.scatter(y_test, y_predict, alpha=0.4)
+    # plt.xlabel("Actual health_value")
+    # plt.ylabel("Predicted health_value")
+    # plt.title("KNN")
+    # plt.show()
+
+    # print the accuracy
+    print("\n" + target)
+    print('KNN Accuracy:')
+    print('for train set: ', knn.score(x_train, y_train))
+    print('for test set: ', np.mean(y_predict == y_test))
+
+    y_predict = pd.DataFrame(y_predict)
+    print(y_predict.head(30))
+
+# target list 에 있는 것들 하나씩 scale_knn의 target으로 주기
+for idx, target in enumerate(target_list):
+    Scaling_KNN(data, feature_list, target, 'minmax', 0.2, 3)
