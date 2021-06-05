@@ -8,7 +8,7 @@ from sklearn.model_selection import train_test_split
 # setting show all col
 pd.set_option('display.max_columns', None)
 
-data = pd.read_csv('C:/Users/An Chihyun/Desktop/total dataset_cleaned_edit.csv')
+data = pd.read_csv('total dataset_cleaned_edit.csv')
 
 # Remove column
 # T00_ID, T00_DATA_CLASS, and T01_EDATE are to be excluded from scaling
