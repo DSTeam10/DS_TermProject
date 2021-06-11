@@ -1,8 +1,8 @@
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import GridSearchCV, KFold, RandomizedSearchCV
 import numpy as np
 import pandas as pd
 from sklearn import preprocessing
-import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 
 # setting show all col
@@ -21,343 +21,6 @@ data.fillna(data.mean(), inplace=True)
 # Change data type from object to float
 data = data.apply(pd.to_numeric, errors='coerce').fillna(0)
 
-# Change drinking level to frequency
-data_drink = data.replace({'T01_DRINK': {1: 0, 2: 1, 3: 2}})
-
-# LIB patient data
-# Height ~150cm
-H140W40_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (50 > data_drink['T01_WEIGHT'])]
-H140W50_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H140W60_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H140W70_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H140W80_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 150cm~160cm
-H150W40_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H150W50_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H150W60_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H150W70_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H150W80_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 160cm~170cm
-H160W40_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H160W50_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H160W60_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H160W70_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H160W80_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 170cm~180cm
-H170W40_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H170W50_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H170W60_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H170W70_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H170W80_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 180cm~
-H180W40_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H180W50_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H180W60_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H180W70_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H180W80_LIB_mean = data_drink[(data_drink['T01_LIP'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Calculate drink frequency mean
-H140W40_LIB_mean = H140W40_LIB_mean['T01_DRINK'].mean()
-H140W50_LIB_mean = H140W50_LIB_mean['T01_DRINK'].mean()
-H140W60_LIB_mean = H140W60_LIB_mean['T01_DRINK'].mean()
-H140W70_LIB_mean = H140W70_LIB_mean['T01_DRINK'].mean()
-H140W80_LIB_mean = H140W80_LIB_mean['T01_DRINK'].mean()
-
-H150W40_LIB_mean = H150W40_LIB_mean['T01_DRINK'].mean()
-H150W50_LIB_mean = H150W50_LIB_mean['T01_DRINK'].mean()
-H150W60_LIB_mean = H150W60_LIB_mean['T01_DRINK'].mean()
-H150W70_LIB_mean = H150W70_LIB_mean['T01_DRINK'].mean()
-H150W80_LIB_mean = H150W80_LIB_mean['T01_DRINK'].mean()
-
-H160W40_LIB_mean = H160W40_LIB_mean['T01_DRINK'].mean()
-H160W50_LIB_mean = H160W50_LIB_mean['T01_DRINK'].mean()
-H160W60_LIB_mean = H160W60_LIB_mean['T01_DRINK'].mean()
-H160W70_LIB_mean = H160W70_LIB_mean['T01_DRINK'].mean()
-H160W80_LIB_mean = H160W80_LIB_mean['T01_DRINK'].mean()
-
-H170W40_LIB_mean = H170W40_LIB_mean['T01_DRINK'].mean()
-H170W50_LIB_mean = H170W50_LIB_mean['T01_DRINK'].mean()
-H170W60_LIB_mean = H170W60_LIB_mean['T01_DRINK'].mean()
-H170W70_LIB_mean = H170W70_LIB_mean['T01_DRINK'].mean()
-H170W80_LIB_mean = H170W80_LIB_mean['T01_DRINK'].mean()
-
-H180W40_LIB_mean = H180W40_LIB_mean['T01_DRINK'].mean()
-H180W50_LIB_mean = H180W50_LIB_mean['T01_DRINK'].mean()
-H180W60_LIB_mean = H180W60_LIB_mean['T01_DRINK'].mean()
-H180W70_LIB_mean = H180W70_LIB_mean['T01_DRINK'].mean()
-H180W80_LIB_mean = H180W80_LIB_mean['T01_DRINK'].mean()
-
-
-# HTN patient data
-# Height ~150cm
-H140W40_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (50 > data_drink['T01_WEIGHT'])]
-H140W50_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H140W60_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H140W70_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H140W80_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                       & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 150cm~160cm
-H150W40_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H150W50_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H150W60_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H150W70_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H150W80_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 160cm~170cm
-H160W40_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H160W50_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H160W60_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H160W70_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H160W80_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 170cm~180cm
-H170W40_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H170W50_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H170W60_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H170W70_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H170W80_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 180cm~
-H180W40_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H180W50_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H180W60_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H180W70_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H180W80_HTN_mean = data_drink[(data_drink['T01_HTN'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Calculate drink frequency mean
-H140W40_HTN_mean = H140W40_HTN_mean['T01_DRINK'].mean()
-H140W50_HTN_mean = H140W50_HTN_mean['T01_DRINK'].mean()
-H140W60_HTN_mean = H140W60_HTN_mean['T01_DRINK'].mean()
-H140W70_HTN_mean = H140W70_HTN_mean['T01_DRINK'].mean()
-H140W80_HTN_mean = H140W80_HTN_mean['T01_DRINK'].mean()
-
-H150W40_HTN_mean = H150W40_HTN_mean['T01_DRINK'].mean()
-H150W50_HTN_mean = H150W50_HTN_mean['T01_DRINK'].mean()
-H150W60_HTN_mean = H150W60_HTN_mean['T01_DRINK'].mean()
-H150W70_HTN_mean = H150W70_HTN_mean['T01_DRINK'].mean()
-H150W80_HTN_mean = H150W80_HTN_mean['T01_DRINK'].mean()
-
-H160W40_HTN_mean = H160W40_HTN_mean['T01_DRINK'].mean()
-H160W50_HTN_mean = H160W50_HTN_mean['T01_DRINK'].mean()
-H160W60_HTN_mean = H160W60_HTN_mean['T01_DRINK'].mean()
-H160W70_HTN_mean = H160W70_HTN_mean['T01_DRINK'].mean()
-H160W80_HTN_mean = H160W80_HTN_mean['T01_DRINK'].mean()
-
-H170W40_HTN_mean = H170W40_HTN_mean['T01_DRINK'].mean()
-H170W50_HTN_mean = H170W50_HTN_mean['T01_DRINK'].mean()
-H170W60_HTN_mean = H170W60_HTN_mean['T01_DRINK'].mean()
-H170W70_HTN_mean = H170W70_HTN_mean['T01_DRINK'].mean()
-H170W80_HTN_mean = H170W80_HTN_mean['T01_DRINK'].mean()
-
-H180W40_HTN_mean = H180W40_HTN_mean['T01_DRINK'].mean()
-H180W50_HTN_mean = H180W50_HTN_mean['T01_DRINK'].mean()
-H180W60_HTN_mean = H180W60_HTN_mean['T01_DRINK'].mean()
-H180W70_HTN_mean = H180W70_HTN_mean['T01_DRINK'].mean()
-H180W80_HTN_mean = H180W80_HTN_mean['T01_DRINK'].mean()
-
-# DM patient data
-# Height ~150cm
-H140W40_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (50 > data_drink['T01_WEIGHT'])]
-H140W50_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H140W60_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H140W70_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H140W80_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (150 > data_drink['T01_HEIGHT'])
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 150cm~160cm
-H150W40_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H150W50_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H150W60_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H150W70_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H150W80_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (160 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 150)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 160cm~170cm
-H160W40_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H160W50_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H160W60_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H160W70_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H160W80_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (170 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 160)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 170cm~180cm
-H170W40_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H170W50_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H170W60_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H170W70_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H170W80_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (180 > data_drink['T01_HEIGHT']) & (data_drink['T01_HEIGHT'] >= 170)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Height 180cm~
-H180W40_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (50 > data_drink['T01_WEIGHT'])]
-H180W50_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (60 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 50)]
-H180W60_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (70 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 60)]
-H180W70_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (80 > data_drink['T01_WEIGHT']) & (data_drink['T01_WEIGHT'] >= 70)]
-H180W80_DM_mean = data_drink[(data_drink['T01_DM'] == 2) & (data_drink['T01_HEIGHT'] >= 180)
-                        & (data_drink['T01_WEIGHT'] >= 80)]
-
-# Calculate drink frequency mean
-H140W40_DM_mean = H140W40_DM_mean['T01_DRINK'].mean()
-H140W50_DM_mean = H140W50_DM_mean['T01_DRINK'].mean()
-H140W60_DM_mean = H140W60_DM_mean['T01_DRINK'].mean()
-H140W70_DM_mean = H140W70_DM_mean['T01_DRINK'].mean()
-H140W80_DM_mean = H140W80_DM_mean['T01_DRINK'].mean()
-
-H150W40_DM_mean = H150W40_DM_mean['T01_DRINK'].mean()
-H150W50_DM_mean = H150W50_DM_mean['T01_DRINK'].mean()
-H150W60_DM_mean = H150W60_DM_mean['T01_DRINK'].mean()
-H150W70_DM_mean = H150W70_DM_mean['T01_DRINK'].mean()
-H150W80_DM_mean = H150W80_DM_mean['T01_DRINK'].mean()
-
-H160W40_DM_mean = H160W40_DM_mean['T01_DRINK'].mean()
-H160W50_DM_mean = H160W50_DM_mean['T01_DRINK'].mean()
-H160W60_DM_mean = H160W60_DM_mean['T01_DRINK'].mean()
-H160W70_DM_mean = H160W70_DM_mean['T01_DRINK'].mean()
-H160W80_DM_mean = H160W80_DM_mean['T01_DRINK'].mean()
-
-H170W40_DM_mean = H170W40_DM_mean['T01_DRINK'].mean()
-H170W50_DM_mean = H170W50_DM_mean['T01_DRINK'].mean()
-H170W60_DM_mean = H170W60_DM_mean['T01_DRINK'].mean()
-H170W70_DM_mean = H170W70_DM_mean['T01_DRINK'].mean()
-H170W80_DM_mean = H170W80_DM_mean['T01_DRINK'].mean()
-
-H180W40_DM_mean = H180W40_DM_mean['T01_DRINK'].mean()
-H180W50_DM_mean = H180W50_DM_mean['T01_DRINK'].mean()
-H180W60_DM_mean = H180W60_DM_mean['T01_DRINK'].mean()
-H180W70_DM_mean = H180W70_DM_mean['T01_DRINK'].mean()
-H180W80_DM_mean = H180W80_DM_mean['T01_DRINK'].mean()
-
-# LIB patient data result
-LIB_result = pd.DataFrame(data = { "~150cm" : [H140W40_LIB_mean, H140W50_LIB_mean, H140W60_LIB_mean, H140W70_LIB_mean, H140W80_LIB_mean],
-                           "150cm~160cm" : [H150W40_LIB_mean, H150W50_LIB_mean, H150W60_LIB_mean, H150W70_LIB_mean, H150W80_LIB_mean],
-                           "160cm~170cm" : [H160W40_LIB_mean, H160W50_LIB_mean, H160W60_LIB_mean, H160W70_LIB_mean, H160W80_LIB_mean],
-                           "170cm~180cm" : [H170W40_LIB_mean, H170W50_LIB_mean, H170W60_LIB_mean, H170W70_LIB_mean, H170W80_LIB_mean],
-                           "180cm~" : [H180W40_LIB_mean, H180W50_LIB_mean, H180W60_LIB_mean, H180W70_LIB_mean, H180W80_LIB_mean],})
-# Missing data process
-LIB_result.fillna(0.0, inplace=True)
-
-# Number of drinks per week
-LIB_result = LIB_result * 3.5
-LIB_result = LIB_result.round(1)
-
-# Indexing
-LIB_result.index = ["~50kg", "50kg~60kg", "60kg~70kg", "70kg~80kg", "80kg~"]
-
-# HTN patient data result
-HTN_result = pd.DataFrame(data = { "~150cm" : [H140W40_HTN_mean, H140W50_HTN_mean, H140W60_HTN_mean, H140W70_HTN_mean, H140W80_HTN_mean],
-                           "150cm~160cm" : [H150W40_HTN_mean, H150W50_HTN_mean, H150W60_HTN_mean, H150W70_HTN_mean, H150W80_HTN_mean],
-                           "160cm~170cm" : [H160W40_HTN_mean, H160W50_HTN_mean, H160W60_HTN_mean, H160W70_HTN_mean, H160W80_HTN_mean],
-                           "170cm~180cm" : [H170W40_HTN_mean, H170W50_HTN_mean, H170W60_HTN_mean, H170W70_HTN_mean, H170W80_HTN_mean],
-                           "180cm~" : [H180W40_HTN_mean, H180W50_HTN_mean, H180W60_HTN_mean, H180W70_HTN_mean, H180W80_HTN_mean],})
-# Missing data process
-HTN_result.fillna(0.0, inplace=True)
-
-# Number of drinks per week
-HTN_result = HTN_result * 3.5
-HTN_result = HTN_result.round(1)
-
-# Indexing
-HTN_result.index = ["~50kg", "50kg~60kg", "60kg~70kg", "70kg~80kg", "80kg~"]
-
-# DM patient data result
-DM_result = pd.DataFrame(data = { "~150cm" : [H140W40_DM_mean, H140W50_DM_mean, H140W60_DM_mean, H140W70_DM_mean, H140W80_DM_mean],
-                           "150cm~160cm" : [H150W40_DM_mean, H150W50_DM_mean, H150W60_DM_mean, H150W70_DM_mean, H150W80_DM_mean],
-                           "160cm~170cm" : [H160W40_DM_mean, H160W50_DM_mean, H160W60_DM_mean, H160W70_DM_mean, H160W80_DM_mean],
-                           "170cm~180cm" : [H170W40_DM_mean, H170W50_DM_mean, H170W60_DM_mean, H170W70_DM_mean, H170W80_DM_mean],
-                           "180cm~" : [H180W40_DM_mean, H180W50_DM_mean, H180W60_DM_mean, H180W70_DM_mean, H180W80_DM_mean],})
-# Missing data process
-DM_result.fillna(0.0, inplace=True)
-
-# Number of drinks per week
-DM_result = DM_result * 3.5
-DM_result = DM_result.round(1)
-
-# Indexing
-DM_result.index = ["~50kg", "50kg~60kg", "60kg~70kg", "70kg~80kg", "80kg~"]
-
-print("<Drinking frequency according to height and weight of LIB patients>\n")
-print(LIB_result, "\n")
-
-print("<Drinking frequency according to height and weight of HTN patients>\n")
-print(HTN_result, "\n")
-
-print("<Drinking frequency according to height and weight of DM patients>\n")
-print(DM_result, "\n")
-
 # feature - Blood health indicators
 feature_list = ['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0', 'T01_TCHL', 'T01_HDL']
 x = data[['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0',
@@ -365,80 +28,195 @@ x = data[['T01_SBP', 'T01_DBP', 'T01_HBA1C', 'T01_GLU0',
 # target - Categorical data for drink (FQ)
 target_list = ['T01_DRINK', 'T01_TAKFQ', 'T01_RICEFQ', 'T01_WINEFQ', 'T01_BEERFQ', 'T01_HLIQFQ']
 
-# test data set
+# define GridSearchCV parameters
+param_grid = [{
+    'weights':["uniform", "distance"],
+    'metric' : ['euclidean', 'manhattan', 'minkowski'],
+    'n_neighbors' : list(range(1,20)),
+}]
 
-# function with robust-scaling and knn
-# Receive data, feature, target as param
-# Classify train and test sets
-def Scaling_KNN(data, feature, target, scaling, test_size, n_neighbors):
+# definition : function with encoder, All scaling and knn, It calculate best scaling auto.
+# input : dataset, independent feature, target feature, test size
+# return : void
+def AutoFunction(data, feature, target, test_size):
     x = data[feature]
     y = data[target]
 
-    # Split the dataset into 4/5 training and 1/5 for testing.
-    x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+    # ******************************** Ordinal encoding and onehot encoding ********************************
+    print("\n〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓 Target : {} 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓".format(target))
+    print("\n────────────────────────────────────── OrdinalEncoding ──────────────────────────────────────")
+    enc = preprocessing.OrdinalEncoder()
+    enc_result_ordinal = enc.fit_transform(y.to_numpy().reshape(-1,1))
 
-    # ------------------------------------- Scaling ------------------------------------------------
-    # robustScaling
-    if scaling == 'robust':
-        scaler = preprocessing.RobustScaler()
-        scaler.fit(x_train)
-        robust_scaled_train = scaler.transform(x_train)
-        robust_scaled_test = scaler.transform(x_test)
+    # Split the dataset
+    # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(x, enc_result_ordinal.ravel(), test_size=test_size)
 
-        # numpy to dataframe
-        x_train = pd.DataFrame(robust_scaled_train)
-        x_test = pd.DataFrame(robust_scaled_test)
+    # Scaling
+    x_train_robust, x_test_robust, x_train_standard, x_test_standard, x_train_min_max, x_test_min_max, x_train_max_abs, x_test_max_abs = getScaling(x_train, x_test)
 
-    # standardScaling
-    elif scaling == 'standard':
-        scaler = preprocessing.StandardScaler()
-        scaler.fit(x_train)
-        standard_scaled_train = scaler.transform(x_train)
-        standard_scaled_test = scaler.transform(x_test)
+    # get Accuracy
+    ac_train_robust_grid, ac_train_robust_rand, ac_test_robust = getAccuracy(x_train_robust, y_train, x_test_robust, y_test,'Robust Scaling')
+    ac_train_standard_grid, ac_train_standard_rand, ac_test_standard = getAccuracy(x_train_standard, y_train, x_test_standard, y_test,'Standard Scaling')
+    ac_train_min_max_grid, ac_train_min_max_rand, ac_test_min_max = getAccuracy(x_train_min_max, y_train, x_test_min_max, y_test,'MinMax Scaling')
+    ac_train_max_abs_grid, ac_train_max_abs_rand, ac_test_max_abs = getAccuracy(x_train_max_abs, y_train, x_test_max_abs, y_test,'MaxAbs Scaling')
+    # print Accuracy
+    # print("ac_train_robust : {}, ac_test_robust : {}".format(ac_train_robust, ac_test_robust))
+    # print("ac_train_standard : {}, ac_test_standard : {}".format(ac_train_standard, ac_test_standard))
+    # print("ac_train_max_abs : {}, ac_test_max_abs : {}".format(ac_train_max_abs, ac_test_max_abs))
+    print("\n┌────────────────────────────────── Best Score ──────────────────────────────────┐")
+    print("(TRAIN SETS) Robust Scaling 'GridSearch CV' best score : ({})".format(ac_train_robust_grid))
+    print("(TRAIN SETS) Robust Scaling 'Randomized CV' best score : ({})".format(ac_train_robust_rand))
 
-        # numpy to dataframe
-        x_train = pd.DataFrame(standard_scaled_train)
-        x_test = pd.DataFrame(standard_scaled_test)
+    print("(TRAIN SETS) Standard Scaling 'GridSearch CV' best score : ({})".format(ac_train_standard_grid))
+    print("(TRAIN SETS) Standard Scaling 'Randomized CV' best score : ({})".format(ac_train_standard_rand))
 
-    # minmaxScaling
-    elif scaling == 'minmax':
-        scaler = preprocessing.MinMaxScaler()
-        scaler.fit(x_train)
-        minmax_scaled_train = scaler.transform(x_train)
-        minmax_scaled_test = scaler.transform(x_test)
+    print("(TRAIN SETS) MinMax Scaling 'GridSearch CV' best score : ({})".format(ac_train_min_max_grid))
+    print("(TRAIN SETS) MinMax Scaling 'Randomized CV' best score : ({})".format(ac_train_min_max_rand))
 
-        # numpy to dataframe
-        x_train = pd.DataFrame(minmax_scaled_train)
-        x_test = pd.DataFrame(minmax_scaled_test)
+    print("(TRAIN SETS) MaxAbs Scaling 'GridSearch CV' best score : ({})".format(ac_train_max_abs_grid))
+    print("(TRAIN SETS) MaxAbs Scaling 'Randomized CV' best score : ({})".format(ac_train_max_abs_rand))
 
-    else:
-        print("error occur")
-        return 0
 
-    # -------------------------------- KNN --------------------------------
+    result_accuray_test = [ac_test_robust, ac_test_standard, ac_test_min_max, ac_test_max_abs]
+    # Index of the most accurate values
+    index = result_accuray_test.index(max(result_accuray_test))
+    if index == 0:
+        print("(TEST SETS) Robust scaling is best score : ({})".format(max(result_accuray_test)))
+    if index == 1:
+        print("(TEST SETS) Standard scaling is best score : {})".format(max(result_accuray_test)))
+    if index == 2:
+        print("(TEST SETS) MinMax scaling is best score : ({})".format(max(result_accuray_test)))
+    if index == 3:
+        print("(TEST SETS) MaxAbs scaling is best score : ({})".format(max(result_accuray_test)))
+
+    # --------------------------------------------------------------------------------------------------
+
+    print("\n────────────────────────────────────── OneHotEncoding ──────────────────────────────────────")
+    enc = preprocessing.OneHotEncoder()
+    enc_result_one_hot = enc.fit_transform(y.to_numpy().reshape(-1,1)).toarray()
+    # Split the dataset
+    # x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=test_size)
+    x_train, x_test, y_train, y_test = train_test_split(x, enc_result_ordinal.ravel(), test_size=test_size)
+
+    # Scaling
+    x_train_robust, x_test_robust, x_train_standard, x_test_standard, x_train_min_max, x_test_min_max, x_train_max_abs, x_test_max_abs = getScaling(
+        x_train, x_test)
+    # get Accuracy
+    ac_train_robust_grid, ac_train_robust_rand, ac_test_robust = getAccuracy(x_train_robust, y_train, x_test_robust,
+                                                                             y_test,'Robust Scaling')
+    ac_train_standard_grid, ac_train_standard_rand, ac_test_standard = getAccuracy(x_train_standard, y_train,
+                                                                                   x_test_standard, y_test,'Standard Scaling')
+    ac_train_min_max_grid, ac_train_min_max_rand, ac_test_min_max = getAccuracy(x_train_min_max, y_train,
+                                                                                x_test_min_max, y_test,'MinMax Scaling')
+    ac_train_max_abs_grid, ac_train_max_abs_rand, ac_test_max_abs = getAccuracy(x_train_max_abs, y_train,
+                                                                                x_test_max_abs, y_test,'MaxAbs Scaling')
+    # print Accuracy
+    # print("ac_train_robust : {}, ac_test_robust : {}".format(ac_train_robust, ac_test_robust))
+    # print("ac_train_standard : {}, ac_test_standard : {}".format(ac_train_standard, ac_test_standard))
+    # print("ac_train_max_abs : {}, ac_test_max_abs : {}".format(ac_train_max_abs, ac_test_max_abs))
+    print("\n┌────────────────────────────────── Best Score ──────────────────────────────────┐")
+    print("(TRAIN SETS) Robust Scaling 'GridSearch CV' best score : ({})".format(ac_train_robust_grid))
+    print("(TRAIN SETS) Robust Scaling 'Randomized CV' best score : ({})".format(ac_train_robust_rand))
+
+    print("(TRAIN SETS) Standard Scaling 'GridSearch CV' best score : ({})".format(ac_train_standard_grid))
+    print("(TRAIN SETS) Standard Scaling 'Randomized CV' best score : ({})".format(ac_train_standard_rand))
+
+    print("(TRAIN SETS) MinMax Scaling 'GridSearch CV' best score : ({})".format(ac_train_min_max_grid))
+    print("(TRAIN SETS) MinMax Scaling 'Randomized CV' best score : ({})".format(ac_train_min_max_rand))
+
+    print("(TRAIN SETS) MaxAbs Scaling 'GridSearch CV' best score : ({})".format(ac_train_max_abs_grid))
+    print("(TRAIN SETS) MaxAbs Scaling 'Randomized CV' best score : ({})".format(ac_train_max_abs_rand))
+
+    result_accuray_test = [ac_test_robust, ac_test_standard, ac_test_min_max, ac_test_max_abs]
+    # Index of the most accurate values
+    index = result_accuray_test.index(max(result_accuray_test))
+    if index == 0:
+        print("(TEST SETS) Robust scaling is best score ({})".format(max(result_accuray_test)))
+    if index == 1:
+        print("(TEST SETS) Standard scaling is best score {})".format(max(result_accuray_test)))
+    if index == 2:
+        print("(TEST SETS) MinMax scaling is best score ({})".format(max(result_accuray_test)))
+    if index == 3:
+        print("(TEST SETS) MaxAbs scaling is best score ({})".format(max(result_accuray_test)))
+
+# definition : return all scaling object (Robust, Standard, MinMax, MaxAbs)
+# input : x_train, x_test
+# return : x_train_robust, x_test_robust, x_train_standard, x_test_standard, x_train_min_max, x_test_min_max, x_train_max_abs, x_test_max_abs
+def getScaling(x_train, x_test):
+    ########### Robust scaling ############
+    scaler = preprocessing.RobustScaler()
+    scaler.fit(x_train)
+    robust_scaled_train = scaler.transform(x_train)
+    robust_scaled_test = scaler.transform(x_test)
+
+    # numpy to dataframe
+    x_train_robust = pd.DataFrame(robust_scaled_train)
+    x_test_robust = pd.DataFrame(robust_scaled_test)
+
+    ########### Standard scaling ############
+    scaler = preprocessing.StandardScaler()
+    scaler.fit(x_train)
+    standard_scaled_train = scaler.transform(x_train)
+    standard_scaled_test = scaler.transform(x_test)
+
+    # numpy to dataframe
+    x_train_standard = pd.DataFrame(standard_scaled_train)
+    x_test_standard = pd.DataFrame(standard_scaled_test)
+
+    ########### MinMax scaling ############
+    scaler = preprocessing.MinMaxScaler()
+    scaler.fit(x_train)
+    min_max_scaled_train = scaler.transform(x_train)
+    min_max_scaled_test = scaler.transform(x_test)
+
+    # numpy to dataframe
+    x_train_min_max = pd.DataFrame(min_max_scaled_train)
+    x_test_min_max = pd.DataFrame(min_max_scaled_test)
+
+    ########### MaxAbs scaling ############
+    scaler = preprocessing.MaxAbsScaler()
+    scaler.fit(x_train)
+    max_abs_scaled_train = scaler.transform(x_train)
+    max_abs_scaled_test = scaler.transform(x_test)
+
+    # numpy to dataframe
+    x_train_max_abs = pd.DataFrame(max_abs_scaled_train)
+    x_test_max_abs = pd.DataFrame(max_abs_scaled_test)
+
+    return x_train_robust, x_test_robust, x_train_standard, x_test_standard, x_train_min_max, x_test_min_max, x_train_max_abs, x_test_max_abs
+
+# definition : get accuracy each of scaling
+# input : x_train,y_train,x_test,y_test,n_neighbors, current scaling name
+# return : Train accuracy and Test accuracy
+def getAccuracy(x_train,y_train,x_test,y_test,scale_name):
+    # Kfold for KNN
+    # prepare the cross-validation procedure
+    kfold = KFold(n_splits=5, shuffle=True, random_state=1)
+
     y_train = y_train.astype('int')
-    knn = KNeighborsClassifier(n_neighbors=n_neighbors)
-
+    knn = KNeighborsClassifier()
     knn.fit(x_train, y_train)
 
     # Values predicted by the test set
     y_predict = knn.predict(x_test)
 
-    # Representation of correct answer and prediction data set accuracy in matplotlib
-    # plt.scatter(y_test, y_predict, alpha=0.4)
-    # plt.xlabel("Actual health_value")
-    # plt.ylabel("Predicted health_value")
-    # plt.title("KNN")
-    # plt.show()
+    # grid-search
+    grid_search = GridSearchCV(knn, param_grid, cv=kfold, verbose=1, n_jobs=-1)
+    grid_search.fit(x_train, y_train)
+    print("\n┌───────────────────── {} ─────────────────────┐".format(scale_name))
+    print("\n│               GridSearchCV's best params                 │")
+    print(grid_search.best_params_)
 
-    # print the accuracy
-    print("\n" + target)
-    print('KNN Accuracy:')
-    print('for train set: ', knn.score(x_train, y_train))
-    print('for test set: ', np.mean(y_predict == y_test))
+    # randomized-search
+    randomized_search = RandomizedSearchCV(knn, param_grid, cv=kfold, verbose=1, n_jobs=-1)
+    randomized_search.fit(x_train, y_train)
+    print("\n│               RandomizedSearch CV's best params          │")
+    print(randomized_search.best_params_)
 
-    y_predict = pd.DataFrame(y_predict)
+    # return knn.score(x_train, y_train), np.mean(y_predict == y_test)
+    return grid_search.best_score_, randomized_search.best_score_, np.mean(y_predict == y_test)
 
-# Assign each one in the target list as the target of scale_knn
+# Assign each one in the target list as the target of AutoFunction
 for idx, target in enumerate(target_list):
-    Scaling_KNN(data, feature_list, target, 'robust', 0.2, 3)
+    AutoFunction(data, feature_list, target, 0.2)
